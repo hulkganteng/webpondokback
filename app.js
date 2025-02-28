@@ -3,8 +3,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const fs = require('fs');  // Tambahkan ini untuk mengimpor fs
-const https = require('https');  // Tambahkan untuk HTTPS
+const fs = require('fs');  // Mengimpor fs untuk file sistem
+const https = require('https');  // Mengimpor https untuk server HTTPS
 const pool = require('./db');
 
 const app = express();
@@ -84,18 +84,20 @@ app.use("/api/gallery", (req, res, next) => {
   else adminAuth(req, res, next);
 }, galleryRoutes);
 
-// HTTPS Setup (Jika menggunakan HTTPS)
+// HTTPS Setup (Jika menggunakan HTTPS) - Pastikan menggunakan hanya satu server
 const options = {
   cert: fs.readFileSync('/etc/letsencrypt/live/ppassyafiiyahbungah.com/fullchain.pem'),  // Sesuaikan dengan jalur yang benar
   key: fs.readFileSync('/etc/letsencrypt/live/ppassyafiiyahbungah.com/privkey.pem')  // Sesuaikan dengan jalur yang benar
 };
 
+// Menggunakan HTTPS untuk server
 https.createServer(options, app).listen(3002, () => {
-  console.log('Server is running on https://localhost:3002');
+  console.log('Server is running on https://ppassyafiiyahbungah.com:3002');
 });
 
-// Set Port dan Jalankan Server
-const PORT = process.env.PORT || 3002;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// Jika Anda menggunakan HTTPS, tidak perlu lagi mendengarkan dengan app.listen
+// Sehingga hapus bagian ini
+// const PORT = process.env.PORT || 3002;
+// app.listen(PORT, () => {
+//   console.log(`Server is running on port ${PORT}`);
+// });
