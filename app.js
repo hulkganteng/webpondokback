@@ -86,8 +86,8 @@ app.use("/api/gallery", (req, res, next) => {
 
 // HTTPS Setup (Jika menggunakan HTTPS)
 const options = {
-  cert: fs.readFileSync('/etc/ssl/certs/certificate.crt'),
-  key: fs.readFileSync('/etc/ssl/private/private.key')
+  cert: fs.readFileSync('/etc/letsencrypt/live/ppassyafiiyahbungah.com/fullchain.pem'),  // Sesuaikan dengan jalur yang benar
+  key: fs.readFileSync('/etc/letsencrypt/live/ppassyafiiyahbungah.com/privkey.pem')  // Sesuaikan dengan jalur yang benar
 };
 
 https.createServer(options, app).listen(3002, () => {
