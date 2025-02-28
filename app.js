@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 
 // Pengaturan CORS untuk mengizinkan hanya domain yang aman (HTTPS)
 const corsOptions = {
-  origin: 'https://ppassyafiiyahbungah.com',  // Ganti dengan domain Anda yang sesuai
+  origin: ['https://ppassyafiiyahbungah.com', 'http://localhost:3002'],  // Contoh domain lain untuk pengembangan
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 };
