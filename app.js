@@ -3,6 +3,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');  // Tambahkan ini untuk mengimpor fs
+const https = require('https');  // Tambahkan untuk HTTPS
 const pool = require('./db');
 
 const app = express();
@@ -17,27 +19,19 @@ pool.getConnection()
     console.error("Database connection error:", err);
   });
 
-// Middleware untuk mengalihkan HTTP ke HTTPS
-app.use((req, res, next) => {
-  if (req.protocol === 'http') {
-    return res.redirect(301, `https://${req.headers.host}${req.url}`);
-  }
-  next();
-});
-
-// Sertifikat SSL
-const options = {
-  cert: fs.readFileSync('/path/to/your/certificate.crt'),
-  key: fs.readFileSync('/path/to/your/private.key')
-};
-
-https.createServer(options, app).listen(3002, () => {
-  console.log('Server is running on https://localhost:3002');
-});
+// Middleware untuk mengalihkan HTTP ke HTTPS hanya di lingkungan produksi
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.protocol === 'http') {
+      return res.redirect(301, `https://${req.headers.host}${req.url}`);
+    }
+    next();
+  });
+}
 
 // Pengaturan CORS untuk mengizinkan hanya domain yang aman (HTTPS)
 const corsOptions = {
-  origin: ['https://ppassyafiiyahbungah.com', 'http://localhost:3002'],  // Contoh domain lain untuk pengembangan
+  origin: ['https://ppassyafiiyahbungah.com', 'http://localhost:3000'],  // Menambahkan localhost untuk pengembangan
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 };
@@ -89,6 +83,16 @@ app.use("/api/gallery", (req, res, next) => {
   if (req.method === "GET") next();
   else adminAuth(req, res, next);
 }, galleryRoutes);
+
+// HTTPS Setup (Jika menggunakan HTTPS)
+const options = {
+  cert: fs.readFileSync('/etc/ssl/certs/certificate.crt'),
+  key: fs.readFileSync('/etc/ssl/private/private.key')
+};
+
+https.createServer(options, app).listen(3002, () => {
+  console.log('Server is running on https://localhost:3002');
+});
 
 // Set Port dan Jalankan Server
 const PORT = process.env.PORT || 3002;
