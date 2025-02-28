@@ -25,6 +25,16 @@ app.use((req, res, next) => {
   next();
 });
 
+// Sertifikat SSL
+const options = {
+  cert: fs.readFileSync('/path/to/your/certificate.crt'),
+  key: fs.readFileSync('/path/to/your/private.key')
+};
+
+https.createServer(options, app).listen(3002, () => {
+  console.log('Server is running on https://localhost:3002');
+});
+
 // Pengaturan CORS untuk mengizinkan hanya domain yang aman (HTTPS)
 const corsOptions = {
   origin: ['https://ppassyafiiyahbungah.com', 'http://localhost:3002'],  // Contoh domain lain untuk pengembangan
