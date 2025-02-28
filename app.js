@@ -5,12 +5,6 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const pool = require('./db');
 
-// Import route modules (tanpa otentikasi global)
-const authRoutes = require('./routes/auth');
-const newsRoutes = require('./routes/news');
-const articlesRoutes = require('./routes/articles');
-const galleryRoutes = require('./routes/gallery');
-
 const app = express();
 
 // Uji koneksi ke database
@@ -23,10 +17,32 @@ pool.getConnection()
     console.error("Database connection error:", err);
   });
 
+// Middleware untuk mengalihkan HTTP ke HTTPS
+app.use((req, res, next) => {
+  if (req.protocol === 'http') {
+    return res.redirect(301, `https://${req.headers.host}${req.url}`);
+  }
+  next();
+});
+
+// Pengaturan CORS untuk mengizinkan hanya domain yang aman (HTTPS)
+const corsOptions = {
+  origin: 'https://ppassyafiiyahbungah.com',  // Ganti dengan domain Anda yang sesuai
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
+
 // Middleware
-app.use(cors());
 app.use(bodyParser.json());
 app.use('/uploads', express.static(process.env.UPLOAD_DIR || 'uploads'));
+
+// Import route modules (tanpa otentikasi global)
+const authRoutes = require('./routes/auth');
+const newsRoutes = require('./routes/news');
+const articlesRoutes = require('./routes/articles');
+const galleryRoutes = require('./routes/gallery');
 
 // Public routes (tidak dilindungi)
 app.use('/api/auth', authRoutes);
@@ -64,6 +80,7 @@ app.use("/api/gallery", (req, res, next) => {
   else adminAuth(req, res, next);
 }, galleryRoutes);
 
+// Set Port dan Jalankan Server
 const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
